@@ -35,6 +35,8 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/MutexSupport.o \
+	${OBJECTDIR}/SemaphoreEvents.o \
 	${OBJECTDIR}/main.o
 
 
@@ -62,10 +64,20 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/multithreading: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/multithreading ${OBJECTFILES} ${LDLIBSOPTIONS} -pthread
 
+${OBJECTDIR}/MutexSupport.o: MutexSupport.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Src_Common_Linux/Etc -I/Src_Common_Linux/Inc -I. -I/Src_Common_Linux/Usr -std=c++14 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MutexSupport.o MutexSupport.cpp
+
+${OBJECTDIR}/SemaphoreEvents.o: SemaphoreEvents.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Src_Common_Linux/Etc -I/Src_Common_Linux/Inc -I. -I/Src_Common_Linux/Usr -std=c++14 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/SemaphoreEvents.o SemaphoreEvents.cpp
+
 ${OBJECTDIR}/main.o: main.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
-	$(COMPILE.cc) -g -std=c++14 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
+	$(COMPILE.cc) -g -I/Src_Common_Linux/Etc -I/Src_Common_Linux/Inc -I. -I/Src_Common_Linux/Usr -std=c++14 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/main.o main.cpp
 
 # Subprojects
 .build-subprojects:

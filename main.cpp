@@ -53,6 +53,8 @@
 //    printf("sched_getcpu = %d\n", sched_getcpu());
 //    return EXIT_SUCCESS;
 //}
+
+
 #include<sched.h>
 #include<pthread.h>
 #include<semaphore.h>
@@ -62,6 +64,10 @@
 #include<iostream>
 #include<condition_variable>
 #include<mutex>
+#include<libudev.h>
+
+#include "SemaphoreEvents.h"
+#include "MutexSupport.h"
 
 using namespace std;
 sem_t emptyBuffers,fullBuffers,oneEmptyBuffer, oneFullBuffer; 
@@ -94,20 +100,20 @@ bool isEmpty()
 
 void write_func(void *buffers)
 {
-//    unique_lock<&m> lock; 
-//    cv.wait(&lock,[]{return !isFull();}); 
-//    char *buf = (char *)buffers;
-//    int i, writePt = 0; 
-//    char data ; 
-//    for (i =0; i< DATA_LENGTH;i++)
-//    {
-//        data = PrepareData(); 
-//        buf[writePt]= data; 
-//        cout<< pthread_self() << " buffer["<<writePt<<"] = "<< data <<endl;
-//        writePt = (writePt +1) % NUM_TOTAL_BUFFERS;
-//        
-//    }
-//    cv.notify_all();
+    unique_lock<&m> lock; 
+    cv.wait(&lock,[]{return !isFull();}); 
+    char *buf = (char *)buffers;
+    int i, writePt = 0; 
+    char data ; 
+    for (i =0; i< DATA_LENGTH;i++)
+    {
+        data = PrepareData(); 
+        buf[writePt]= data; 
+        cout<< pthread_self() << " buffer["<<writePt<<"] = "<< data <<endl;
+        writePt = (writePt +1) % NUM_TOTAL_BUFFERS;
+        
+    }
+    cv.notify_all();
 }
 
 void * writter_func (void *buffers)
@@ -218,14 +224,80 @@ void * onereader_func(void *buffer)
     }
     
 }
+
+WinStyleEvents *Event ; 
+
+void * classSemaphorewritter_func(void *buffer)
+{
+    bool quitreq = 0; 
+    char *buf = (char *)buffer;
+    int i, writePt = 0; 
+    char data,key ; 
+    struct timespec ts;
+    for(int i =0; i< 10; i++)
+    {
+        data = PrepareData(); 
+        cout<<"Data prepared = "<<data<<endl;
+        sleep(1);
+        Event->SetEvent();    
+        *buf = data;
+        ts.tv_sec += 1;
+        Event->WaitForSingleObject(1000);
+        if(errno == ETIMEDOUT)
+        {
+            cout<<"single read semaphore timeout"<< endl; 
+        }
+//        else
+//        {
+//            quitreq = 1;
+//        }
+        
+    }
+}
+void * classSemaphorereader_func(void *buffer)
+{
+    bool quitreq = 0; 
+     char *buf = (char *)buffer;
+    int readPt =0; 
+    char data ;
+    struct timespec ts;
+    sleep(15);
+    while(!quitreq)
+    {   
+        BOOL b = Event->CheckEvent();
+        if(!b)
+            printf("Checkevent failed \n");
+        clock_gettime(CLOCK_REALTIME, &ts);
+        ts.tv_sec += 1;
+        Event->WaitForSingleObject(1000);
+        if(errno == ETIMEDOUT )
+        {
+            cout<<"single semaphore timedout"<<endl; 
+            continue;
+            
+        }
+//        else
+//        {
+//            quitreq = 1;
+//        }
+        data = buf[0]; 
+        cout<< pthread_self() << " buffer = "<< data <<endl;
+        ProcessData();
+    }
+    
+}
 #include <cerrno>
 #include <cstring>
 
-    pthread_t writer, reader, one_writer, one_reader ; 
+    pthread_t writer, reader, one_writer, one_reader, class_writter, class_reader ; 
     char buffers[NUM_TOTAL_BUFFERS];
     char bufff;
     char onebuffer;
-//    sem_init(&emptyBuffers, 0,NUM_TOTAL_BUFFERS);
+
+        
+int main(int argc, char**argv) 
+{
+//            sem_init(&emptyBuffers, 0,NUM_TOTAL_BUFFERS);
 //    sem_init(&fullBuffers,0,0);
 //    pthread_create (&writer, NULL,writter_func,buffers);
 //    pthread_create (&reader, NULL,reader_func, buffers); 
@@ -234,7 +306,7 @@ void * onereader_func(void *buffer)
 //    sem_destroy(&emptyBuffers);
 //    sem_destroy(&fullBuffers);
       
-    
+ /////////onewrtter/////////////////////////////////////////////// 
 //    sem_init(&oneFullBuffer,0,1);
 //    pthread_create (&one_writer, NULL,onewritter_func,&buffers);
 //    pthread_create (&one_reader, NULL,onereader_func, &buffers); 
@@ -242,7 +314,19 @@ void * onereader_func(void *buffer)
 //    pthread_join(one_reader, NULL);
 //    printf("All done \n");    
 //    sem_destroy(&oneFullBuffer);
+////////////////////////////////////////////////////////////////////
     
+    
+/////////class semaphore///////////////////////////////////////////
+    Event = new WinStyleEvents("/Evnt");
+    Event->CreateEvent();
+   // Event.InitEventObject("/Evnt1");
+    pthread_create (&class_writter, NULL,classSemaphorewritter_func,&buffers);
+    pthread_create (&class_reader, NULL,classSemaphorereader_func, &buffers); 
+    pthread_join(class_writter, NULL);
+    pthread_join(class_reader, NULL);
+    printf("All done \n");    
+////////////////////////////////////////////////////////////////////
     
 //        struct sched_param params; 
 //     // We'll set the priority to the maximum.
@@ -264,25 +348,6 @@ void * onereader_func(void *buffer)
 //         std::cout << "Couldn't retrieve real-time scheduling paramers" << std::endl;
 //        
 //     }
-        
-int main(int argc, char**argv) 
-{
-        struct sched_param par={0};
-          par.sched_priority=99;
-
- 
-            par.sched_priority = sched_get_priority_max(SCHED_FIFO);
-              if((sched_setscheduler(getpid(),SCHED_FIFO,&par)!=0))
-                          printf("Not realtime\n");
-             else
-                            printf("Realtime\n");
-            __int64_t j =1; 
-            cout<<"size of :"<<sizeof(j)<<endl;;
-            
-             
-            
-            
-            return 0;
     //command to execute : g++-8 welcome.cc -std=c++17 -no-pie -lpthread
  
   return 0;

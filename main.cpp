@@ -100,8 +100,8 @@ bool isEmpty()
 
 void write_func(void *buffers)
 {
-    unique_lock<&m> lock; 
-    cv.wait(&lock,[]{return !isFull();}); 
+    unique_lock<std::mutex> lock(m); 
+    cv.wait(lock,[]{return !isFull();}); 
     char *buf = (char *)buffers;
     int i, writePt = 0; 
     char data ; 

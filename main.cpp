@@ -74,7 +74,7 @@ sem_t emptyBuffers,fullBuffers,oneEmptyBuffer, oneFullBuffer;
 std::condition_variable cv; 
 std::mutex m; 
 bool quitReq = 0;
-#define NUM_TOTAL_BUFFERS 5 
+#define NUM_TOTAL_BUFFERS 5
 #define DATA_LENGTH 20 
 static int counter = 0 ; 
 static char PrepareData(void)
@@ -176,18 +176,22 @@ void * onewritter_func(void *buffer)
     int i, writePt = 0; 
     char data,key ; 
     struct timespec ts;
-    for(int i =0; i< 10; i++)
+    //for(int i =0; i< 10; i++)
+     while(!quitreq)
     {
         data = PrepareData(); 
         cout<<"Data prepared = "<<data<<endl;
+        sem_post(&oneFullBuffer);   
         sleep(1);
-        sem_post(&oneFullBuffer);    
+        
         *buf = data;
-        ts.tv_sec += 1;
+        ts.tv_nsec += (1000*1000000);        
+        ts.tv_sec += ts.tv_nsec / 1000000000;
+        ts.tv_nsec %= 1000000000;
         sem_timedwait(&oneFullBuffer,&ts);
         if(errno == ETIMEDOUT)
         {
-            cout<<"single read semaphore timeout"<< endl; 
+            cout<<"single write semaphore timeout"<< endl; 
         }
 //        else
 //        {
@@ -203,7 +207,7 @@ void * onereader_func(void *buffer)
     int readPt =0; 
     char data ;
     struct timespec ts;
-    sleep(15);
+    sleep(1);
     while(!quitreq)
     {
         clock_gettime(CLOCK_REALTIME, &ts);
@@ -211,7 +215,7 @@ void * onereader_func(void *buffer)
         sem_timedwait(&oneFullBuffer,&ts);
         if(errno == ETIMEDOUT )
         {
-            cout<<"single semaphore timedout"<<endl; 
+            cout<<"single read semaphore timedout"<<endl; 
             
         }
 //        else
@@ -245,7 +249,7 @@ void * classSemaphorewritter_func(void *buffer)
         Event->WaitForSingleObject(1000);
         if(errno == ETIMEDOUT)
         {
-            cout<<"single read semaphore timeout"<< endl; 
+            cout<<"class write semaphore timeout"<< endl; 
         }
 //        else
 //        {
@@ -261,19 +265,23 @@ void * classSemaphorereader_func(void *buffer)
     int readPt =0; 
     char data ;
     struct timespec ts;
-    sleep(15);
+    BOOL b = Event->CheckEvent();
+    if(!b)
+    {
+            printf("Checkevent failed \n");
+            return 0;
+    }
+    sleep(2);
     while(!quitreq)
     {   
-        BOOL b = Event->CheckEvent();
-        if(!b)
-            printf("Checkevent failed \n");
+        
         clock_gettime(CLOCK_REALTIME, &ts);
         ts.tv_sec += 1;
+        
         Event->WaitForSingleObject(1000);
         if(errno == ETIMEDOUT )
         {
-            cout<<"single semaphore timedout"<<endl; 
-            continue;
+            cout<<"class read semaphore timedout"<<endl;             
             
         }
 //        else
@@ -297,7 +305,7 @@ void * classSemaphorereader_func(void *buffer)
         
 int main(int argc, char**argv) 
 {
-//            sem_init(&emptyBuffers, 0,NUM_TOTAL_BUFFERS);
+//    sem_init(&emptyBuffers, 0,NUM_TOTAL_BUFFERS);
 //    sem_init(&fullBuffers,0,0);
 //    pthread_create (&writer, NULL,writter_func,buffers);
 //    pthread_create (&reader, NULL,reader_func, buffers); 
@@ -307,7 +315,7 @@ int main(int argc, char**argv)
 //    sem_destroy(&fullBuffers);
       
  /////////onewrtter/////////////////////////////////////////////// 
-//    sem_init(&oneFullBuffer,0,1);
+//    sem_init(&oneFullBuffer,0,5);
 //    pthread_create (&one_writer, NULL,onewritter_func,&buffers);
 //    pthread_create (&one_reader, NULL,onereader_func, &buffers); 
 //    pthread_join(one_writer, NULL);

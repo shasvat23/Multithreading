@@ -53,9 +53,11 @@ class WinStyleEvents
 {
     
 private: 
+#if 0
     _hMutex EventMutex;
+#endif
     _hSemEvent *hsem;
-    _hSemEvent *temp;
+   
 public:
     WinStyleEvents(const char *name); 
     ~WinStyleEvents();

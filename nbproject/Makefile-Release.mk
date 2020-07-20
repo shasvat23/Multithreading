@@ -36,6 +36,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 # Object Files
 OBJECTFILES= \
 	${OBJECTDIR}/MutexSupport.o \
+	${OBJECTDIR}/ResourceLock.o \
 	${OBJECTDIR}/SemaphoreEvents.o \
 	${OBJECTDIR}/main.o
 
@@ -68,6 +69,11 @@ ${OBJECTDIR}/MutexSupport.o: MutexSupport.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} "$@.d"
 	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/MutexSupport.o MutexSupport.cpp
+
+${OBJECTDIR}/ResourceLock.o: ResourceLock.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -O2 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/ResourceLock.o ResourceLock.cpp
 
 ${OBJECTDIR}/SemaphoreEvents.o: SemaphoreEvents.cpp
 	${MKDIR} -p ${OBJECTDIR}

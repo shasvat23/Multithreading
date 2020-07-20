@@ -1,8 +1,10 @@
 build/Debug/GNU-Linux/main.o: main.cpp SemaphoreEvents.h stdafx.h \
- MutexSupport.h
+ MutexSupport.h ResourceLock.h
 
 SemaphoreEvents.h:
 
 stdafx.h:
 
 MutexSupport.h:
+
+ResourceLock.h:

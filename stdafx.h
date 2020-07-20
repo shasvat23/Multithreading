@@ -16,6 +16,7 @@
 #include <fstream>
 #define ARRAYSIZE(a) (sizeof(a)/sizeof((a)[0]))
 typedef int32_t     BOOL;
-
+#define TRUE 1
+#define FALSE 0
 
 

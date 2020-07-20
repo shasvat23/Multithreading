@@ -69,6 +69,8 @@
 #include "SemaphoreEvents.h"
 #include "MutexSupport.h"
 
+#include "ResourceLock.h"
+
 using namespace std;
 sem_t emptyBuffers,fullBuffers,oneEmptyBuffer, oneFullBuffer; 
 std::condition_variable cv; 
@@ -302,7 +304,70 @@ void * classSemaphorereader_func(void *buffer)
     char bufff;
     char onebuffer;
 
+   void child(const char command)
+   {
+       _hResourceLock h = resourceLock_create("/Dummy"); 
+       cout<<endl<<"Child::"<<h<<endl;
+        BOOL b;
+    //b = resourceLock_release( h);
+    
+        while(command!='q')
+        {
+            printf("\nChild :: Acquiring Resource");  
+            b = resourceLock_get( h, 1000);
+            if(b==TRUE)
+            {
+                printf("\nChild :: Resource Acquired");  
+                sleep(5);
+                printf("\nChild :: Releasing Resource");  
+                b=resourceLock_release(h);
+                if(b==TRUE)
+                    printf("\nChild :: Resource Released");
+                sleep(5);
+                
+            }
+            else
+            {
+                printf("\nChild :: Failed to acquire resource ");
+                sleep(5);
+            }
+        }
         
+        
+    
+   }
+   
+   void parent(const char command)
+   {
+       _hResourceLock h = resourceLock_create("/Dummy"); 
+       cout<<endl<<"Parent::"<<h<<endl;
+        BOOL b;
+    //b = resourceLock_release( h);
+        while(command !='q')
+        {
+            sleep(5);
+            printf("\nParent :: Acquiring Resource");  
+            b = resourceLock_get( h, 1000);    
+            if(b==TRUE)
+            {
+                printf("\nParent :: Resource Acquired");
+                sleep(3);
+                printf("\nParent :: Releasing Resource");  
+                b=resourceLock_release(h);
+                if(b==TRUE)
+                {
+                    printf("\nParent :: Resource Released");
+                }
+            }
+            else
+            {
+                printf("\nParent :: failed to acquire resource"); 
+                sleep(5);
+            }
+        }
+    
+   }
+    
 int main(int argc, char**argv) 
 {
 //    sem_init(&emptyBuffers, 0,NUM_TOTAL_BUFFERS);
@@ -326,14 +391,14 @@ int main(int argc, char**argv)
     
     
 /////////class semaphore///////////////////////////////////////////
-    Event = new WinStyleEvents("/Evnt");
-    Event->CreateEvent();
-   // Event.InitEventObject("/Evnt1");
-    pthread_create (&class_writter, NULL,classSemaphorewritter_func,&buffers);
-    pthread_create (&class_reader, NULL,classSemaphorereader_func, &buffers); 
-    pthread_join(class_writter, NULL);
-    pthread_join(class_reader, NULL);
-    printf("All done \n");    
+//    Event = new WinStyleEvents("/Evnt");
+//    Event->CreateEvent();
+//   // Event.InitEventObject("/Evnt1");
+//    pthread_create (&class_writter, NULL,classSemaphorewritter_func,&buffers);
+//    pthread_create (&class_reader, NULL,classSemaphorereader_func, &buffers); 
+//    pthread_join(class_writter, NULL);
+//    pthread_join(class_reader, NULL);
+//    printf("All done \n");    
 ////////////////////////////////////////////////////////////////////
     
 //        struct sched_param params; 
@@ -356,6 +421,31 @@ int main(int argc, char**argv)
 //         std::cout << "Couldn't retrieve real-time scheduling paramers" << std::endl;
 //        
 //     }
+    
+    
+/////////////////////////Resource Lock Example//////////////////////////////////
+    
+    pid_t pid;
+    pid = fork(); 
+    
+    if(pid < 0)
+    {
+        exit(EXIT_FAILURE);
+    }
+        
+    if(!pid)
+    {
+        child('a'); 
+        printf("\nChild done with semaphore ");
+    }
+    
+    else
+    {
+        parent('a');
+        printf("\nParent done with semaphore ");
+    }
+////////////////////////////////////////////////////////////////////////////////   
+    
     //command to execute : g++-8 welcome.cc -std=c++17 -no-pie -lpthread
  
   return 0;

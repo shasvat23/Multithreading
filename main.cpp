@@ -372,83 +372,83 @@ void * classSemaphorereader_func(void *buffer)
 //   }
 //**********************************************************************************
 #define FILE_NAME "/FLockTRIAL"
-   
+#include "FileLocking.h"
 //*********************************Class based ,not working properly*****************    
-//     void childFileLock( char command)
-//   {
-//         int fd;
-////       int fd  = acquireLock(FILE_NAME,1000); 
-////       cout<<endl<<"Child::"<<fd<<endl;
-//        BOOL b;
-//    //b = resourceLock_release( h);
-//        ResourceLock C; 
-//        C.createLock(FILE_NAME);
-//        cout << "Child :: Fd "<<C.fd<<endl;
-//        while(command!='q')
-//        {
-//            cout<<"Child :: Acquiring Resource"<<endl;  
-//            b = C.acquireLock(  1000);
-//            if(!b)
-//            {
-//                cout<<"\nChild :: Resource Acquired"<<endl;  
-//                sleep(5);
-////                command = 'q';
-////                continue;
-//                cout<<"\nChild :: Releasing Resource"<<endl;  
-//                b=C.releaseLock();
-//                if(b==TRUE)
-//                    cout<<"\nChild :: Resource Released"<<endl;
-//                sleep(5);
-//                
-//            }
-//            else
-//            {
-//                cout<<"Child :: Failed to acquire resource "<<endl;
-//                sleep(5);
-//            }
-//        }
-//        
-//        cout<<"\nChild :: quitting .."<<endl;
-//    
-//   }
-//   
-//   void parentFileLock( char command)
-//   {
-//       int fd;
-////       int fd = acquireLock(FILE_NAME,1000); 
-////       cout<<endl<<"Parent::"<<fd<<endl;
-//        BOOL b;
-//    //b = resourceLock_release( h);
-//        ResourceLock P;
-//        P.createLock(FILE_NAME);
-//        cout << "Parent :: Fd "<<P.fd<<endl;
-//        while(command !='q')
-//        {
-//            cout<<"Parent :: Sleeping for 10 secs .."<<endl;
-//            sleep(10);
-//            cout<<"Parent :: Acquiring Resource"<<endl;  
-//            b = P.acquireLock(10000);    
-//            if(!b)
-//            {
-//               cout<<"Parent :: Resource Acquired"<<endl;
-//                sleep(3);
-//                cout<<"Parent :: Releasing Resource"<<endl;  
-//                b=P.releaseLock();
-//                if(b==TRUE)
-//                {
-//                    cout<<"Parent :: Resource Released"<<endl;
-//                }
-//            }
-//            else
-//            {
-//                cout<<"Parent :: failed to acquire resource"<<endl; 
-//               
-//            }
-//        }
-//    
-//   }
-//   
-//   
+     void childFileLock( char command)
+   {
+         int fd;
+//       int fd  = acquireLock(FILE_NAME,1000); 
+//       cout<<endl<<"Child::"<<fd<<endl;
+        BOOL b;
+    //b = resourceLock_release( h);
+        ResourceFileLock C; 
+        C.createLock(FILE_NAME);
+        cout << "Child :: Fd "<<C.fd<<endl;
+        while(command!='q')
+        {
+            cout<<"Child :: Acquiring Resource"<<endl;  
+            b = C.acquireLock(  1000);
+            if(b)
+            {
+                cout<<"\nChild :: Resource Acquired"<<endl;  
+                sleep(5);
+//                command = 'q';
+//                continue;
+                cout<<"\nChild :: Releasing Resource"<<endl;  
+                b=C.releaseLock();
+                if(b==TRUE)
+                    cout<<"\nChild :: Resource Released"<<endl;
+                sleep(5);
+                
+            }
+            else
+            {
+                cout<<"Child :: Failed to acquire resource "<<endl;
+                sleep(5);
+            }
+        }
+        
+        cout<<"\nChild :: quitting .."<<endl;
+    
+   }
+   
+   void parentFileLock( char command)
+   {
+       int fd;
+//       int fd = acquireLock(FILE_NAME,1000); 
+//       cout<<endl<<"Parent::"<<fd<<endl;
+        BOOL b;
+    //b = resourceLock_release( h);
+        ResourceFileLock P;
+        P.createLock(FILE_NAME);
+        cout << "Parent :: Fd "<<P.fd<<endl;
+        while(command !='q')
+        {
+            cout<<"Parent :: Sleeping for 10 secs .."<<endl;
+            sleep(10);
+            cout<<"Parent :: Acquiring Resource"<<endl;  
+            b = P.acquireLock(10000);    
+            if(b)
+            {
+               cout<<"Parent :: Resource Acquired"<<endl;
+                sleep(3);
+                cout<<"Parent :: Releasing Resource"<<endl;  
+                b=P.releaseLock();
+                if(b==TRUE)
+                {
+                    cout<<"Parent :: Resource Released"<<endl;
+                }
+            }
+            else
+            {
+                cout<<"Parent :: failed to acquire resource"<<endl; 
+               
+            }
+        }
+    
+   }
+   
+   
 //******************************************************************************
     
     
@@ -583,32 +583,6 @@ int main(int argc, char**argv)
     
 /////////////////////////Resource Lock Example//////////////////////////////////
     
-//    pid_t pid;
-//    pid = fork(); 
-//    
-//    if(pid < 0)
-//    {
-//        exit(EXIT_FAILURE);
-//    }
-//        
-//    if(!pid)
-//    {
-//        child('a'); 
-//        printf("\nChild done with semaphore ");
-//    }
-//    
-//    else
-//    {
-//        parent('a');
-//        printf("\nParent done with semaphore ");
-//    }
-////////////////////////////////////////////////////////////////////////////////   
-    
-    
-    
-    
-/////////////////////////Resource Lock with flock Example///////////////////////
-    
     pid_t pid;
     pid = fork(); 
     
@@ -619,16 +593,42 @@ int main(int argc, char**argv)
         
     if(!pid)
     {
-        
-        childFileLock_c('a'); 
+        childFileLock('a'); 
         printf("\nChild done with semaphore ");
     }
     
     else
     {
-        parentFileLock_c('a');
+        parentFileLock('a');
         printf("\nParent done with semaphore ");
     }
+////////////////////////////////////////////////////////////////////////////////   
+    
+    
+    
+    
+/////////////////////////Resource Lock with flock Example///////////////////////
+    
+//    pid_t pid;
+//    pid = fork(); 
+//    
+//    if(pid < 0)
+//    {
+//        exit(EXIT_FAILURE);
+//    }
+//        
+//    if(!pid)
+//    {
+//        
+//        childFileLock_c('a'); 
+//        printf("\nChild done with semaphore ");
+//    }
+//    
+//    else
+//    {
+//        parentFileLock_c('a');
+//        printf("\nParent done with semaphore ");
+//    }
     
 ////////////////////////////////////////////////////////////////////////////////
     //command to execute : g++-8 welcome.cc -std=c++17 -no-pie -lpthread

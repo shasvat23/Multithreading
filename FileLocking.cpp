@@ -6,7 +6,7 @@
 
 #include "FileLocking.h"
 
-static ResourceLock *me = NULL; 
+static ResourceFileLock *me = NULL; 
 
 static void timeout_handler(int sig)
 {
@@ -14,7 +14,7 @@ static void timeout_handler(int sig)
     me->timeout_expired =1; 
 }    
     
- ResourceLock::ResourceLock()
+ ResourceFileLock::ResourceFileLock()
 {
      fd= -1; 
      timeout_expired = 0; 
@@ -22,25 +22,25 @@ static void timeout_handler(int sig)
      
 }
  
- ResourceLock::~ResourceLock()
+ ResourceFileLock::~ResourceFileLock()
  {
      
  }
  
  
- BOOL ResourceLock::createLock(char *FileName)
+ BOOL ResourceFileLock::createLock(char *FileName)
  {
      if(!FileName)
          return FALSE; 
      strncpy(fName,FileName,strlen(FileName));
      fd =  open(fName, O_CREAT|O_RDWR, S_IRWXU|S_IRWXG|S_IRWXO);
-     if(fd <= 0)
+     if(fd < 0)
          return FALSE; 
      
      return TRUE;
             
  }
-BOOL ResourceLock::acquireLock(int msTimeout)
+BOOL ResourceFileLock::acquireLock(int msTimeout)
 {
     if(fd <= 0)
         return FALSE;
@@ -77,7 +77,7 @@ BOOL ResourceLock::acquireLock(int msTimeout)
                 if(timeout_expired){
                     setitimer(ITIMER_REAL, &old_timer, NULL);
                     sigaction(SIGALRM,&old_sa, NULL); 
-                    return -1;
+                    return FALSE;
                 }
                 else
                     continue; 
@@ -95,14 +95,14 @@ BOOL ResourceLock::acquireLock(int msTimeout)
     
 }
 
-BOOL ResourceLock::releaseLock()
+BOOL ResourceFileLock::releaseLock()
 {
     flock(fd, LOCK_UN);    
     return TRUE;
 }
 
 
-BOOL ResourceLock::deleteLock()
+BOOL ResourceFileLock::deleteLock()
 {
     close(fd);
     return TRUE;

@@ -25,11 +25,11 @@
 #include <signal.h>
 
 
-class ResourceLock{
+class ResourceFileLock{
     
 public:
-ResourceLock();
-~ResourceLock();
+ResourceFileLock();
+~ResourceFileLock();
 BOOL createLock(char *FileName);    
 BOOL acquireLock(int msTimeout);
 BOOL releaseLock(); 

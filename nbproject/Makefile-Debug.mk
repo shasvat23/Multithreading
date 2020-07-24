@@ -35,6 +35,7 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/FileLocking.o \
 	${OBJECTDIR}/MutexSupport.o \
 	${OBJECTDIR}/ResourceLock.o \
 	${OBJECTDIR}/SemaphoreEvents.o \
@@ -64,6 +65,11 @@ LDLIBSOPTIONS=
 ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/multithreading: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/multithreading ${OBJECTFILES} ${LDLIBSOPTIONS} -pthread
+
+${OBJECTDIR}/FileLocking.o: FileLocking.cpp
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} "$@.d"
+	$(COMPILE.cc) -g -I/Src_Common_Linux/Etc -I/Src_Common_Linux/Inc -I. -I/Src_Common_Linux/Usr -std=c++14 -MMD -MP -MF "$@.d" -o ${OBJECTDIR}/FileLocking.o FileLocking.cpp
 
 ${OBJECTDIR}/MutexSupport.o: MutexSupport.cpp
 	${MKDIR} -p ${OBJECTDIR}

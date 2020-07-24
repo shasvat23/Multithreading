@@ -4,6 +4,7 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>FileLocking.h</itemPath>
       <itemPath>MutexSupport.h</itemPath>
       <itemPath>ResourceLock.h</itemPath>
       <itemPath>SemaphoreEvents.h</itemPath>
@@ -16,6 +17,7 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>FileLocking.cpp</itemPath>
       <itemPath>MutexSupport.cpp</itemPath>
       <itemPath>ResourceLock.cpp</itemPath>
       <itemPath>SemaphoreEvents.cpp</itemPath>
@@ -61,6 +63,10 @@
           <commandLine>-pthread</commandLine>
         </linkerTool>
       </compileType>
+      <item path="FileLocking.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FileLocking.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="MutexSupport.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="MutexSupport.h" ex="false" tool="3" flavor2="0">
@@ -99,6 +105,10 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="FileLocking.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FileLocking.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="MutexSupport.cpp" ex="false" tool="1" flavor2="0">
       </item>
       <item path="MutexSupport.h" ex="false" tool="3" flavor2="0">

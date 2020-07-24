@@ -6,28 +6,28 @@
 
 /* 
  * File:   ResourceLock.h
- * Author: VIBE-USER
+ * Author: SCP
  *
- * Created on July 20, 2020, 1:38 PM
+ * Created on July 24, 2020, 2:27 PM
  */
 
-#ifndef RESOURCELOCK_H
-#define RESOURCELOCK_H
+#ifndef ResourceLock
+#define ResourceLock
 
 #include "stdafx.h"
-#include <semaphore.h>
-#include <pthread.h>
-#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <fcntl.h>
-#include <errno.h>
+#include <unistd.h>
+#include <string.h>
+#include <sys/file.h>
+#include <sys/time.h>
+#include <signal.h>
 
 
-typedef void * _hResourceLock; 
 
-_hResourceLock resourceLock_create(const char *name);
-BOOL resourceLock_get(_hResourceLock h, unsigned uiMilliseconds);
-BOOL resourceLock_release(_hResourceLock h);
-BOOL resourceLock_try(_hResourceLock h);
-
-#endif /* RESOURCELOCK_H */
+typedef int _ResourceLockHandle;
+_ResourceLockHandle Get_ResourceLock(char *lockFile, int msTimeout) ; //create and gets resource lock if does not exist, else if exist just gets it if available
+BOOL Release_ResourceLock (_ResourceLockHandle lockFd) ;
+#endif /* ResourceLock */
 

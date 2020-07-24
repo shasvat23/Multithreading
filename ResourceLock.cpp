@@ -1,76 +1,65 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-#include "stdafx.h"
 #include "ResourceLock.h"
+static sig_atomic_t timeout_expired = 0;
+//************************************************************
+
+static void timeout_handler(int sig)
+{
+  (void)sig;
+
+  timeout_expired = 1;
+}
 
 
-_hResourceLock resourceLock_create(const char *name)
+//************************************************************
+_ResourceLockHandle Get_ResourceLock(char *lockFile, int msTimeout) 
 {
-    sem_t *sem_id = sem_open(name,O_CREAT,0600,0);
-    
-    if(sem_id == SEM_FAILED)
+    struct itimerval timeout, old_timer;
+    struct sigaction sa, old_sa;
+    int err;
+    int sTimeout = msTimeout/1000;
+    memset(&timeout, 0, sizeof timeout);
+
+    timeout.it_value.tv_sec = sTimeout;
+    timeout.it_value.tv_usec = ((msTimeout-(sTimeout*1000))*1000);
+
+    memset(&sa, 0, sizeof sa);
+
+    sa.sa_handler = timeout_handler;
+    sa.sa_flags   = SA_RESETHAND;
+    sigaction(SIGALRM, &sa, &old_sa);
+    setitimer(ITIMER_REAL, &timeout, &old_timer);
+
+
+    int lockFd;
+    int cntTimeout = 0;
+
+    if ((lockFd = open(lockFile, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO))  < 0)
+        return -1;
+
+    while (flock(lockFd, LOCK_EX))
     {
-        printf("\nFailed to open semaphore %s", name);
-        return NULL;
-    }
-    
-    sem_unlink(name);
-    sem_post(sem_id);
-    return (_hResourceLock)sem_id;
-    
-    
+        switch( (err = errno) ) {
+            case EINTR:         /* Signal received */
+                if ( timeout_expired )
+                    setitimer(ITIMER_REAL, &old_timer, NULL); /* Cancel itimer */
+                    sigaction(SIGALRM, &old_sa, NULL); /* Cancel signal handler */
+                    return -1;      /* -w option set and failed to lock */
+                continue;           /* otherwise try again */
+            default:            /* Other errors */
+                return -1;  
+        }
+    }   
+
+    setitimer(ITIMER_REAL, &old_timer, NULL); /* Cancel itimer */
+    sigaction(SIGALRM, &old_sa, NULL); /* Cancel signal handler */
+
+    return lockFd;
 }
-BOOL resourceLock_get(_hResourceLock h, unsigned uiMilliseconds)
+//***************************************************************
+BOOL Release_ResourceLock (_ResourceLockHandle lockFd) 
 {
-    if(!h)
-        return FALSE;
-    
-    sem_t *sem_id = (sem_t *)h;
-    
-    struct timespec ts; 
-    if(clock_gettime(CLOCK_REALTIME, &ts)== -1)
-    {
-        return FALSE; 
-    }
-    
-    ts.tv_nsec += (uiMilliseconds*1000000);        
-    ts.tv_sec += ts.tv_nsec / 1000000000;
-    ts.tv_nsec %= 1000000000;
-    
-    
-    int i = sem_timedwait(sem_id,&ts);
-    //int i = sem_timewait(sem_id);
-    if(i<0)
-    {
-        return FALSE;
-    }
-    
+    flock(lockFd, LOCK_UN);
+    close(lockFd);
     return TRUE;
-    
 }
-BOOL resourceLock_release(_hResourceLock h)
-{
-    if(!h)
-        return FALSE; 
-    
-    sem_t *sem_id = (sem_t*)h;
-    
-    int i; 
-    
-    i = sem_post(sem_id);
-    if (i < 0)
-        return FALSE; 
-    //i = sem_close(sem_id);
-    
-    return TRUE;
-    
-    
-}
-BOOL resourceLock_try(_hResourceLock h)
-{
-    
-}
+//************************************************************

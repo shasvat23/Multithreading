@@ -9,9 +9,15 @@ static void timeout_handler(int sig)
   timeout_expired = 1;
 }
 
+_ResourceLockHandle Create_ResourceLock(char *lockFile) 
+{
+       _ResourceLockHandle lockFd = open(lockFile, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO)  ;
+       
+        return lockFd;
+}
 
 //************************************************************
-_ResourceLockHandle Get_ResourceLock(char *lockFile, int msTimeout) 
+BOOL Get_ResourceLock(_ResourceLockHandle lockFd, int msTimeout) 
 {
     struct itimerval timeout, old_timer;
     struct sigaction sa, old_sa;
@@ -30,11 +36,10 @@ _ResourceLockHandle Get_ResourceLock(char *lockFile, int msTimeout)
     setitimer(ITIMER_REAL, &timeout, &old_timer);
 
 
-    int lockFd;
+ 
     int cntTimeout = 0;
 
-    if ((lockFd = open(lockFile, O_CREAT | O_RDWR, S_IRWXU | S_IRWXG | S_IRWXO))  < 0)
-        return -1;
+    
 
     while (flock(lockFd, LOCK_EX))
     {
@@ -43,23 +48,30 @@ _ResourceLockHandle Get_ResourceLock(char *lockFile, int msTimeout)
                 if ( timeout_expired )
                     setitimer(ITIMER_REAL, &old_timer, NULL); /* Cancel itimer */
                     sigaction(SIGALRM, &old_sa, NULL); /* Cancel signal handler */
-                    return -1;      /* -w option set and failed to lock */
+                    return FALSE;      /* -w option set and failed to lock */
                 continue;           /* otherwise try again */
             default:            /* Other errors */
-                return -1;  
+                return FALSE;  
         }
     }   
 
     setitimer(ITIMER_REAL, &old_timer, NULL); /* Cancel itimer */
     sigaction(SIGALRM, &old_sa, NULL); /* Cancel signal handler */
 
-    return lockFd;
+    return TRUE;
 }
 //***************************************************************
 BOOL Release_ResourceLock (_ResourceLockHandle lockFd) 
 {
     flock(lockFd, LOCK_UN);
+    
+    return TRUE;
+}
+
+BOOL Delete_ResourceLock (_ResourceLockHandle lockFd)
+{    
     close(lockFd);
     return TRUE;
 }
+
 //************************************************************

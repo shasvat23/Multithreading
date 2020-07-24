@@ -27,7 +27,9 @@
 
 
 typedef int _ResourceLockHandle;
-_ResourceLockHandle Get_ResourceLock(char *lockFile, int msTimeout) ; //create and gets resource lock if does not exist, else if exist just gets it if available
+_ResourceLockHandle Create_ResourceLock(char *lockFile) ;
+BOOL Get_ResourceLock(_ResourceLockHandle h, int msTimeout) ; //create and gets resource lock if does not exist, else if exist just gets it if available
 BOOL Release_ResourceLock (_ResourceLockHandle lockFd) ;
+
 #endif /* ResourceLock */
 

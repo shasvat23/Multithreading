@@ -461,12 +461,12 @@ void * classSemaphorereader_func(void *buffer)
         BOOL b;
     //b = resourceLock_release( h);
         
-       
+        fd = Create_ResourceLock(FILE_NAME);
         while(command!='q')
         {
             cout<<"Child_C :: Acquiring Resource"<<endl;  
-            fd= Get_ResourceLock(FILE_NAME, 1000);
-            if(fd > 0)
+            b = Get_ResourceLock(fd, 1000);
+            if(b == TRUE)
             {
                 cout<<"Child_C :: Resource Acquired"<<endl;  
                 sleep(5);
@@ -498,14 +498,14 @@ void * classSemaphorereader_func(void *buffer)
         BOOL b;
     //b = resourceLock_release( h);
         
-        
+        fd = Create_ResourceLock(FILE_NAME);
         while(command !='q')
         {
             cout<<"Parent_C :: Sleeping for 3 secs .."<<endl;
             sleep(3);
             cout<<"Parent_C :: Acquiring Resource"<<endl;  
-            fd = Get_ResourceLock(FILE_NAME,1000);    
-            if(fd > 0)
+            b = Get_ResourceLock(fd,1000);    
+            if(b == TRUE)
             {
                cout<<"Parent_C :: Resource Acquired"<<endl;
                 sleep(3);

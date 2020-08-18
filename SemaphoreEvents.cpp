@@ -18,7 +18,7 @@
 #include <string.h>
 
 
-//this is just a test entry for git
+//this is just a test entry for git, SCP trying to create conflict
 
 void strNcpy(char *dst, const char *src, int max)
 	{

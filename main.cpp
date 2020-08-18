@@ -63,6 +63,8 @@
 #include<condition_variable>
 #include<mutex>
 
+//This is test entry 2 SCP 
+
 using namespace std;
 sem_t emptyBuffers,fullBuffers,oneEmptyBuffer, oneFullBuffer; 
 std::condition_variable cv; 

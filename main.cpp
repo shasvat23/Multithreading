@@ -73,7 +73,7 @@
 
 
 
-//This is test entry 2 SCP 
+//This is test entry from SCP, try 2  
 
 using namespace std;
 sem_t emptyBuffers,fullBuffers,oneEmptyBuffer, oneFullBuffer; 

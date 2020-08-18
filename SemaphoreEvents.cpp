@@ -18,7 +18,7 @@
 #include <string.h>
 
 
-
+//this is just a test entry for git
 
 void strNcpy(char *dst, const char *src, int max)
 	{

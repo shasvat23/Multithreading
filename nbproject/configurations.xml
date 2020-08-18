@@ -4,6 +4,11 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>FileLocking.h</itemPath>
+      <itemPath>MutexSupport.h</itemPath>
+      <itemPath>ResourceLock.h</itemPath>
+      <itemPath>SemaphoreEvents.h</itemPath>
+      <itemPath>stdafx.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ResourceFiles"
                    displayName="Resource Files"
@@ -12,6 +17,10 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <itemPath>FileLocking.cpp</itemPath>
+      <itemPath>MutexSupport.cpp</itemPath>
+      <itemPath>ResourceLock.cpp</itemPath>
+      <itemPath>SemaphoreEvents.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
     </logicalFolder>
     <logicalFolder name="TestFiles"
@@ -26,6 +35,11 @@
       <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
+  <sourceRootList>
+    <Elem>/Src_Common_Linux/Etc</Elem>
+    <Elem>/Src_Common_Linux/Inc</Elem>
+    <Elem>/Src_Common_Linux/Usr</Elem>
+  </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
     <conf name="Debug" type="1">
@@ -37,13 +51,37 @@
       <compileType>
         <ccTool>
           <standard>11</standard>
+          <incDir>
+            <pElem>/Src_Common_Linux/Etc</pElem>
+            <pElem>/Src_Common_Linux/Inc</pElem>
+            <pElem>.</pElem>
+            <pElem>/Src_Common_Linux/Usr</pElem>
+          </incDir>
           <commandLine>-std=c++17</commandLine>
         </ccTool>
         <linkerTool>
           <commandLine>-pthread</commandLine>
         </linkerTool>
       </compileType>
+      <item path="FileLocking.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FileLocking.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MutexSupport.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="MutexSupport.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ResourceLock.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ResourceLock.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SemaphoreEvents.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SemaphoreEvents.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="stdafx.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
     <conf name="Release" type="1">
@@ -67,7 +105,25 @@
           <developmentMode>5</developmentMode>
         </asmTool>
       </compileType>
+      <item path="FileLocking.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="FileLocking.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="MutexSupport.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="MutexSupport.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="ResourceLock.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="ResourceLock.h" ex="false" tool="3" flavor2="0">
+      </item>
+      <item path="SemaphoreEvents.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="SemaphoreEvents.h" ex="false" tool="3" flavor2="0">
+      </item>
       <item path="main.cpp" ex="false" tool="1" flavor2="0">
+      </item>
+      <item path="stdafx.h" ex="false" tool="3" flavor2="0">
       </item>
     </conf>
   </confs>

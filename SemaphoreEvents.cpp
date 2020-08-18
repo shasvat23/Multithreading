@@ -18,7 +18,15 @@
 #include <string.h>
 
 
+<<<<<<< Updated upstream
 //this is just a test entry for git, SCP trying to create conflict
+=======
+<<<<<<< HEAD
+//this is just a test entry for git, trial 2
+=======
+//this is just a test entry for git, SCP trying to create conflict
+>>>>>>> b110adc243da65cabad726f705dbd470c1a0e128
+>>>>>>> Stashed changes
 
 void strNcpy(char *dst, const char *src, int max)
 	{
